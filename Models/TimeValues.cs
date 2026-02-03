@@ -1,8 +1,8 @@
 ﻿namespace TimeScaleWebApi.Models
 {
-    public class Values
+    public class TimeValues
     {
-        int Id { get; set; }
+        public int Id { get; set; }
         public string Filename { get; set; } = null!;
         public DateTimeOffset Date { get; set; }
         public double ExecutionTime { get; set; }
