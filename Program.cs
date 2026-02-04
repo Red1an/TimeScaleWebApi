@@ -1,12 +1,14 @@
-using Microsoft.EntityFrameworkCore;
-using TimeScaleWebApi.Data;
 using dotenv.net;
+using TimeScaleWebApi.Data;
+using TimeScaleWebApi.Services;
 
 DotEnv.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationContext>();
+builder.Services.AddScoped<CsvUploadService>();
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
@@ -19,11 +21,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapControllers();
 
 
 app.Run();
