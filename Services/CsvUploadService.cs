@@ -15,18 +15,23 @@ namespace TimeScaleWebApi.Services
         {
             var filename = Path.GetFileName(file.FileName);
             string? line;
-            int lineNumber = 0;
+            int lineNumber = 1;
             var values = new List<TimeValues>();
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 using var sr = new StreamReader(file.OpenReadStream());
-
+                var header = await sr.ReadLineAsync();
                 while ((line = await sr.ReadLineAsync()) != null)
                 {
                     lineNumber++;
-                    var row = line.Split(',');
+                    var row = line.Split(';');
+                    if (row.Length != 3)
+                    {
+                        throw new Exception($"Строка {lineNumber}: неверное количество столбцов");
+                    }
+
                     var dateStr = row[0];
                     var execStr = row[1];
                     var valStr = row[2];
@@ -75,9 +80,9 @@ namespace TimeScaleWebApi.Services
                     values.Add(new TimeValues
                     {
                         Filename = filename,
-                        Date = DateTimeOffset.Parse(dateStr).ToUniversalTime(),
-                        ExecutionTime = double.Parse(execStr),
-                        Value = double.Parse(valStr)
+                        Date = date,
+                        ExecutionTime = exec,
+                        Value = value
                     });
 
                 }
@@ -99,6 +104,7 @@ namespace TimeScaleWebApi.Services
                 var result = CalculateResults(filename, values);
                 _context.Results.Add(result);
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
             catch
             {
