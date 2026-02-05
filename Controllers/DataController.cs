@@ -61,5 +61,22 @@ namespace TimeScaleWebApi.Controllers
             return Ok(results);
         }
 
+        [HttpGet("{filename}/latest")]
+        public async Task<IActionResult> GetLatestValues(string filename)
+        {
+            var latest = await _context.Values
+                .Where(v => v.Filename == filename)
+                .OrderByDescending(v => v.Date)
+                .Take(10)
+                .ToListAsync();
+
+            if (!latest.Any())
+            {
+                return NotFound(new { error = $"Данные для файла '{filename}' не найдены" });
+            }
+
+            var sorted = latest.OrderBy(v => v.Date).ToList();
+            return Ok(sorted);
+        }
     }
 }
