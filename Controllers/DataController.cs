@@ -20,7 +20,7 @@ namespace TimeScaleWebApi.Controllers
             try
             {
                 var cvsService = new CsvUploadService(_context);
-                await cvsService?.UploadCsvAsync(file);
+                await cvsService.UploadCsvAsync(file);
                 return Ok(new { message = "Файл успешно загружен и обработан" });
             }
             catch (Exception ex)
